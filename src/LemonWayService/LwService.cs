@@ -56,9 +56,14 @@ namespace com.lemonway
 		public LwResponse Call(string serviceName, LwRequest request) 
 		{
 			var t = CallAsync(serviceName, request);
-			t.Wait();
-			if (t.Exception!=null) 
-				throw t.Exception;
+			try
+			{
+				t.Wait();
+			}
+			catch (AggregateException ex)
+			{
+				throw ex.Flatten().InnerException;
+			}
 			return t.Result;
 		}
 	}
