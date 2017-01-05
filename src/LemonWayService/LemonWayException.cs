@@ -31,6 +31,10 @@ namespace com.lemonway
 	{
 		public string ErrorCode { get; private set; }
 		public string ErrorMessage { get; private set; }
+
+		/// <summary>
+		/// Do not display it to your end-user
+		/// </summary>
 		public string PrivateInfo { get; private set; }
 
 		public BusinessException(string errorCode, string message, string privateInfo) : base($"{errorCode} - {message}")
