@@ -7,23 +7,30 @@ using Newtonsoft.Json.Linq;
 
 namespace com.lemonway
 {
+	public interface ILwService
+	{
+		string DirectkitUrl {get;}
+		Task<LwResponse> CallAsync(string serviceName, LwRequest request);
+		LwResponse Call(string serviceName, LwRequest request);
+	}
+
 	/// <summary>
 	/// Helper to call LemonwayService
 	/// </summary>
-	public class LwService
+	public class LwService: ILwService
 	{
-		private string directkitUrl;
-		private bool throwBusinessException;
+		public string DirectkitUrl { get; private set; }
+		public bool ThrowBusinessException { get; private set; }
 
 		public LwService(string directkit_json2_url, bool throwBusinessException = true)
 		{
-			this.directkitUrl = directkit_json2_url;
-			this.throwBusinessException = throwBusinessException;
+			this.DirectkitUrl = directkit_json2_url;
+			this.ThrowBusinessException = throwBusinessException;
 		}
 
 		public async Task<LwResponse> CallAsync(string serviceName, LwRequest request) 
 		{
-			var serviceUrl = $"{directkitUrl}/{serviceName}";
+			var serviceUrl = $"{DirectkitUrl}/{serviceName}";
 			using (var client = new HttpClient())
 			{
 				client.BaseAddress = new Uri(serviceUrl);
@@ -37,7 +44,7 @@ namespace com.lemonway
 					var responseJson = await response.Content.ReadAsStringAsync();
 					var resu = JsonConvert.DeserializeObject<LwResponse>(responseJson);
 
-					if (throwBusinessException)
+					if (ThrowBusinessException)
 					{
 						//check if the service returned a Business error
 						var err = resu.d["E"];
@@ -65,6 +72,11 @@ namespace com.lemonway
 				throw ex.Flatten().InnerException;
 			}
 			return t.Result;
+		}
+
+		public override string ToString()
+		{
+			return $"({nameof(LwService)}: {DirectkitUrl})";
 		}
 	}
 }

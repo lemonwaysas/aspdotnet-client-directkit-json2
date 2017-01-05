@@ -5,9 +5,14 @@
 	/// </summary>
 	public class LwConfig
 	{
-		public string Login;
-		public string Password;
-		public string Language = "en";
-		public string Version = "10.0";
+		public string Login { get; set; }
+		public string Password { get; set; }
+		public string Language { get; set; } = "en";
+		public string Version { get; set; } = "10.0";
+
+		public override string ToString()
+		{
+			return $"({nameof(LwConfig)}: {nameof(Login)}={Login}, {nameof(Password)}={Password}, {nameof(Version)}={Version})";
+		}
 	}
 }
