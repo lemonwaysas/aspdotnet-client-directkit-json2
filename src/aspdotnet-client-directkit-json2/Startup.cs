@@ -7,12 +7,16 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using com.lemonway;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace aspdotnet_client_directkit_json2
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
+
+		public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
@@ -27,8 +31,20 @@ namespace aspdotnet_client_directkit_json2
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add framework services.
-            services.AddMvc();
+			var lwConfigSection = Configuration.GetSection("LemonWay");
+
+			// Add framework services
+			services.AddMvc();
+
+			// inject the lemonway service configuration
+			services.AddOptions();
+			services.Configure<LwConfig>(lwConfigSection);
+
+			// inject the lemonway service as singleton
+			services.AddSingleton<ILwService, LwService>(serviceProvider => {
+				var directkitUrl = lwConfigSection.GetValue<string>("DirectkitJson2Url");
+				return new LwService(directkitUrl);
+			});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
